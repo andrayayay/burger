@@ -6,72 +6,34 @@ var connection = require("../config/connection.js");
     // insertOne()
     // updateOne()
 
-// Helper functions to build queries
-function printQuestionMarks(num) {
-	var arr = [];
-	for (var i = 0; i < num; i++) {
-		arr.push('?');
-	}
-	return arr.toString();
-}
-
-function objToSql(ob) {
-	var arr = [];
-	for (var key in ob) {
-		if (ob.hasOwnProperty(key)) {
-			arr.push(key + '=' + ob[key]);
-		}
-	}
-	return arr.toString();
-}
-
-
-// Create the ORM
+// Create the ORM (Object Relational Mapping)
+// Pass in query parameters for all 3 methods, including callbacks, to receive the data from the model
 var orm = {
 	selectAll: function(tableInput, cb) {
-		//building our queryString
-		var queryString = 'SELECT * FROM ' + tableInput + ';';
-		//connect and run query
-		connection.query(queryString, function(err, result) {
-			if (err) throw err;
-			cb(result);
+		var queryString = "SELECT * from ??";
+		connection.query(queryString, [tableInput], function(err, res) {
+			if (err) {
+				throw err;
+			}
+			cb(res);
 		});
 	},
-
-    insertOne: function(table, cols, vals, cb) {
-		//build query  
-		var queryString = 'INSERT INTO ' + table;
-			queryString += ' (';
-			queryString += cols.toString();
-			queryString += ') ';
-			queryString += 'VALUES (';
-			queryString += printQuestionMarks(vals.length);
-			queryString += ') ';
-
-			console.log(queryString);
-			console.log(vals);
-
-		//connect and run query
-		connection.query(queryString, vals, function(err, result) {
-			if (err) throw err;
-			cb(result);
+	insertOne: function(tableInput, columnName, burgerName, cb) {
+		var queryString = "INSERT INTO ?? (??) VALUES (?)";
+		connection.query(queryString, [tableInput, columnName, burgerName], function(err, res) {
+			if (err) {
+				throw err;
+			}
+			cb(res);
 		});
 	},
-
-	updateOne: function(table, objColVals, condition, cb) {
-		//build query 
-		var queryString = 'UPDATE ' + table;
-			queryString += ' SET ';
-			queryString += objToSql(objColVals);
-			queryString += ' WHERE ';
-			queryString += condition;
-
-			console.log(queryString);
-
-		//connect and run query
-		connection.query(queryString, function(err, result) {
-			if (err) throw err;
-			cb(result);
+	updateOne: function(tableInput, updateColumnName, updateRowVal, searchColumnName, searchRowVal, cb) {
+		var queryString = "UPDATE ?? SET ?? = ? WHERE ?? = ?";
+		connection.query(queryString, [tableInput, updateColumnName, updateRowVal, searchColumnName, searchRowVal], function(err, res) {
+			if (err) {
+				throw err;
+			}
+			cb(res);
 		});
 	}
 };
